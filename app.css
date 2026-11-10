@@ -1,0 +1,416 @@
+/* Robot Mission Demo - throwaway prototype, fake data only.
+   The display adds light: black is transparent, so the page stays black and
+   only content is bright. Sizes derive from the viewport (rem follows vmin);
+   600 x 600 is the validation target, not a hardcoded size. */
+
+:root {
+  --fg: #ffffff;
+  --fg2: #c3ced6;
+  --fg3: #8b99a3;
+  --line: #5d6b75;
+  --accent: #4fd8ff;
+  --observed: #6dffa8;
+  --uncertain: #ffc857;
+  --focus-fill: #1b2b35;
+  font-size: clamp(12px, 3vmin, 27px); /* 18px at 600 x 600 */
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  inline-size: 100%;
+  block-size: 100%;
+}
+
+body {
+  margin: 0;
+  min-inline-size: 0;
+  overflow: hidden; /* every page is a static single screen; nothing scrolls */
+  background: #000;
+  color: var(--fg);
+  font-family: system-ui, sans-serif; /* the device's own text face; nothing is downloaded */
+  line-height: 1.25;
+}
+
+[hidden] { display: none !important; }
+
+p { margin: 0; }
+
+.shell {
+  display: grid;
+  grid-template-rows: minmax(0, 1fr) auto;
+  inline-size: 100%;
+  block-size: 100%;
+  overflow: hidden;
+}
+
+.pages {
+  min-inline-size: 0;
+  min-block-size: 0;
+}
+
+.page {
+  position: relative;
+  inline-size: 100%;
+  block-size: 100%;
+  min-inline-size: 0;
+  min-block-size: 0;
+  overflow: hidden;
+}
+
+/* ---------- controls and focus ---------- */
+
+button, input {
+  font: inherit;
+  color: var(--fg);
+  background: #000;
+  border: 2px solid var(--line);
+  border-radius: 0.6rem;
+  margin: 0;
+}
+
+button {
+  padding: 0.3rem 0.8rem;
+  cursor: pointer;
+}
+
+/* Focus is the browser's own; this only makes it visible (outline plus a
+   brighter border and a filled surface, so it is not colour alone). */
+button:focus, input:focus {
+  outline: 3px solid var(--fg);
+  outline-offset: 2px;
+  border-color: var(--fg);
+  background: var(--focus-fill);
+}
+
+button:focus-visible, input:focus-visible {
+  outline: 3px solid var(--fg);
+  outline-offset: 2px;
+}
+
+button:active { background: #36505f; }
+
+.eyebrow {
+  font-size: 0.72rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--fg3);
+}
+
+.demo-tag {
+  position: fixed;
+  inset-block-start: 0.65rem;
+  inset-inline-end: 1rem;
+  z-index: 5;
+  padding: 0.05rem 0.4rem;
+  font-size: 0.72rem;
+  color: var(--uncertain);
+  background: #000;
+  border: 1px solid var(--uncertain);
+  border-radius: 0.3rem;
+}
+
+/* ---------- 1. Mission ---------- */
+
+.mission {
+  display: grid;
+  grid-template-rows: auto auto minmax(0, 1fr) auto auto;
+  gap: 0.5rem;
+  padding: 0.65rem 1rem 0.55rem;
+}
+
+.topline {
+  padding-inline-end: 5.8rem; /* room for the Demo data tag */
+  font-size: 0.89rem;
+  color: var(--fg2);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.now {
+  font-size: 1.5rem;
+  font-weight: 700;
+  line-height: 1.15;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.reasoning {
+  display: grid;
+  align-content: start;
+  gap: 0.2rem;
+  min-block-size: 0;
+  overflow: hidden;
+}
+
+.r {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.r0 { font-size: 1.17rem; color: var(--fg); -webkit-line-clamp: 2; line-clamp: 2; }
+.r1 { font-size: 1rem; color: var(--fg2); -webkit-line-clamp: 2; line-clamp: 2; }
+.r2 { font-size: 1rem; color: var(--fg3); -webkit-line-clamp: 2; line-clamp: 2; }
+
+.lower {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 11rem;
+  gap: 0.7rem;
+  block-size: 11rem;
+}
+
+.findings {
+  display: grid;
+  grid-template-rows: auto repeat(3, minmax(0, 1fr));
+  gap: 0.35rem;
+  min-inline-size: 0;
+  min-block-size: 0;
+}
+
+.frow {
+  display: grid;
+  grid-template-columns: 2.3rem minmax(0, 1fr);
+  grid-template-rows: auto auto;
+  column-gap: 0.4rem;
+  align-content: center;
+  align-items: center;
+  min-inline-size: 0;
+  padding: 0.1rem 0.6rem;
+  text-align: start;
+}
+
+.fnum {
+  grid-row: 1 / span 2;
+  font-size: 1.11rem;
+  font-weight: 700;
+}
+
+.fsub {
+  font-size: 0.94rem;
+  line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.fstat {
+  font-size: 0.78rem;
+  line-height: 1.2;
+  color: var(--observed);
+}
+
+.frow.uncertain .fstat { color: var(--uncertain); }
+
+.frow.is-new {
+  border-color: var(--accent);
+  box-shadow: inset 0 0 0 2px var(--accent);
+}
+
+.mapbtn {
+  position: relative;
+  inline-size: 11rem;
+  block-size: 11rem;
+  padding: 0;
+  overflow: hidden;
+}
+
+.mapbtn canvas, .fill canvas {
+  position: absolute;
+  inset: 0;
+  inline-size: 100%;
+  block-size: 100%;
+  display: block;
+}
+
+.actions {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(0, 1fr);
+  gap: 0.7rem;
+}
+
+.actions button {
+  min-block-size: 2.5rem;
+  font-size: 1.05rem;
+  font-weight: 700;
+}
+
+.toast {
+  position: absolute;
+  inset-inline: 1rem;
+  /* just above the findings block, clear of the newest reasoning line */
+  inset-block-end: calc(0.55rem + 2.5rem + 0.5rem + 11rem + 0.6rem);
+  padding: 0.5rem 0.8rem;
+  font-size: 1.05rem;
+  font-weight: 700;
+  text-align: center;
+  color: var(--fg);
+  background: #000;
+  border: 2px solid var(--uncertain);
+  border-radius: 0.6rem;
+}
+
+/* ---------- shared sub-page shell ---------- */
+
+.sub {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  gap: 0.5rem;
+  padding: 0.65rem 1rem 0.6rem;
+}
+
+.bar {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  min-inline-size: 0;
+  padding-inline-end: 5.8rem; /* room for the Demo data tag */
+}
+
+.back {
+  flex: none;
+  padding: 0.25rem 0.7rem;
+  font-size: 0.94rem;
+}
+
+.bar-title {
+  min-inline-size: 0;
+  font-size: 0.94rem;
+  color: var(--fg2);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.fill {
+  position: relative;
+  min-inline-size: 0;
+  min-block-size: 0;
+}
+
+/* ---------- 3. Camera ---------- */
+
+.camera img {
+  position: absolute;
+  inset: 0;
+  inline-size: 100%;
+  block-size: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.cam-top, .cam-bottom {
+  position: absolute;
+  inset-inline: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+}
+
+.cam-top { inset-block-start: 0.65rem; padding-inline-end: 5.8rem; }
+.cam-bottom { inset-block-end: 0.6rem; }
+
+.cam-bottom button {
+  flex: 1 1 0;
+  min-inline-size: 0;
+  min-block-size: 2.3rem;
+  padding-inline: 0.3rem;
+  font-size: 0.89rem;
+  white-space: nowrap;
+}
+
+.cam-bottom #cam-src { flex-grow: 1.6; }
+
+/* The chosen rate is marked by a filled surface and bold text. */
+.cam-bottom button[aria-pressed="true"] {
+  color: #000;
+  background: var(--fg);
+  border-color: var(--fg);
+  font-weight: 700;
+}
+
+.cam-bottom button[aria-pressed="true"]:focus {
+  background: var(--accent);
+}
+
+.hud {
+  padding: 0.15rem 0.45rem;
+  font-family: ui-monospace, monospace;
+  font-size: 0.72rem;
+  line-height: 1.3;
+  white-space: pre;
+  color: var(--fg);
+  background: rgba(0, 0, 0, 0.82);
+  border-radius: 0.3rem;
+}
+
+/* ---------- 4. Finding ---------- */
+
+.finding-body {
+  display: grid;
+  grid-template-rows: auto auto auto minmax(0, 1fr);
+  gap: 0.4rem;
+  min-block-size: 0;
+}
+
+.fd-subject {
+  font-size: 1.5rem;
+  font-weight: 700;
+  line-height: 1.15;
+}
+
+.fd-status { font-size: 1.05rem; color: var(--observed); }
+.fd-status.uncertain { color: var(--uncertain); }
+.fd-claim { font-size: 0.94rem; color: var(--fg2); }
+
+/* ---------- 5. New mission ---------- */
+
+.nm-body { min-block-size: 0; }
+
+.nm-step {
+  display: grid;
+  gap: 0.7rem;
+  align-content: start;
+}
+
+.nm-label { font-size: 1.17rem; font-weight: 700; }
+
+#nm-input {
+  inline-size: 100%;
+  padding: 0.5rem 0.7rem;
+  font-size: 1.17rem;
+}
+
+#nm-input::placeholder { color: var(--fg3); opacity: 1; }
+
+.nm-hint { font-size: 0.89rem; color: var(--uncertain); }
+
+.nm-text {
+  padding: 0.5rem 0.7rem;
+  font-size: 1.17rem;
+  overflow-wrap: anywhere;
+  border-inline-start: 3px solid var(--accent);
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 6;
+  line-clamp: 6;
+  overflow: hidden;
+}
+
+/* ---------- diagnostics strip (?debug=0 hides it) ---------- */
+
+.diag {
+  margin: 0;
+  padding: 0.15rem 0.45rem;
+  block-size: calc(4 * 1.3em + 0.3rem + 1px);
+  overflow: hidden;
+  font-family: ui-monospace, monospace;
+  font-size: 2vmin; /* 12px at 600: 80 columns fit */
+  line-height: 1.3;
+  white-space: pre;
+  color: #a8f0c8;
+  border-block-start: 1px solid #3a4750;
+}

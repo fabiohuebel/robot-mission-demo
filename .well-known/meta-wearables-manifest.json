@@ -1,0 +1,12 @@
+{
+  "version": 1,
+  "name": "Robot Mission Demo",
+  "description": "Demo of a robot mission view. Fake data only; nothing is sent anywhere.",
+  "appearance": {
+    "theme_color": "#2F6FED",
+    "icon": {
+      "src": "../icon.png",
+      "type": "monochrome"
+    }
+  }
+}

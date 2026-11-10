@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Robot Mission Demo</title>
+  <meta name="description" content="Demo of a robot mission view for display glasses. Fake data only; nothing is sent anywhere.">
+  <meta name="application-name" content="Robot Mission Demo">
+  <meta name="mrbd-web-app-capable" content="yes">
+  <meta name="color-scheme" content="dark">
+  <link rel="icon" type="image/png" href="icon.png">
+  <link rel="stylesheet" href="app.css">
+</head>
+<body>
+  <div id="app" class="shell">
+    <main class="pages">
+
+      <!-- 1. Mission (root) -->
+      <section id="page-mission" class="page mission" aria-label="Mission">
+        <p id="m-top" class="topline">Robot 1</p>
+
+        <div class="now-block">
+          <p class="eyebrow">Now</p>
+          <p id="m-now" class="now">&nbsp;</p>
+        </div>
+
+        <div class="reasoning" aria-label="Reasoning updates">
+          <p class="eyebrow">Thinking</p>
+          <p id="m-r0" class="r r0"></p>
+          <p id="m-r1" class="r r1"></p>
+          <p id="m-r2" class="r r2"></p>
+        </div>
+
+        <div class="lower">
+          <div class="findings">
+            <p id="m-fcount" class="eyebrow">Findings</p>
+            <button type="button" id="f0" class="frow"><span class="fnum"></span><span class="fsub"></span><span class="fstat"></span></button>
+            <button type="button" id="f1" class="frow"><span class="fnum"></span><span class="fsub"></span><span class="fstat"></span></button>
+            <button type="button" id="f2" class="frow"><span class="fnum"></span><span class="fsub"></span><span class="fstat"></span></button>
+          </div>
+          <button type="button" id="m-map" class="mapbtn" aria-label="Open map"><canvas id="mini-map"></canvas></button>
+        </div>
+
+        <nav class="actions" aria-label="Actions">
+          <button type="button" id="m-camera">Camera</button>
+          <button type="button" id="m-new">New mission</button>
+        </nav>
+
+        <p id="toast" class="toast" role="status" hidden></p>
+      </section>
+
+      <!-- 2. Map -->
+      <section id="page-map" class="page sub" aria-label="Map" hidden>
+        <div class="bar">
+          <button type="button" id="map-back" class="back" data-act="back">&lsaquo; Back</button>
+          <p id="map-cap" class="bar-title">Map</p>
+        </div>
+        <div class="fill"><canvas id="big-map"></canvas></div>
+      </section>
+
+      <!-- 3. Camera -->
+      <section id="page-camera" class="page camera" aria-label="Camera" hidden>
+        <img id="cam-img" alt="">
+        <div class="cam-top">
+          <button type="button" id="cam-back" class="back" data-act="back">&lsaquo; Back</button>
+          <p id="cam-hud" class="hud">starting</p>
+        </div>
+        <div class="cam-bottom">
+          <button type="button" id="cam-10" data-fps="10" aria-pressed="false">10 fps</button>
+          <button type="button" id="cam-20" data-fps="20" aria-pressed="false">20 fps</button>
+          <button type="button" id="cam-30" data-fps="30" aria-pressed="false">30 fps</button>
+          <button type="button" id="cam-src">Source: live</button>
+        </div>
+      </section>
+
+      <!-- 4. Finding -->
+      <section id="page-finding" class="page sub" aria-label="Finding" hidden>
+        <div class="bar">
+          <button type="button" id="fd-back" class="back" data-act="back">&lsaquo; Back</button>
+          <p id="fd-title" class="bar-title">Finding</p>
+        </div>
+        <div class="finding-body">
+          <p id="fd-subject" class="fd-subject"></p>
+          <p id="fd-status" class="fd-status"></p>
+          <p class="fd-claim">The robot's claim, not checked.</p>
+          <div class="fill"><canvas id="fd-pic"></canvas></div>
+        </div>
+      </section>
+
+      <!-- 5. New mission -->
+      <section id="page-new" class="page sub" aria-label="New mission" hidden>
+        <div class="bar">
+          <button type="button" id="nm-back" class="back" data-act="back">&lsaquo; Back</button>
+          <p class="bar-title">New mission</p>
+        </div>
+        <div class="nm-body">
+          <div id="nm-step1" class="nm-step">
+            <label for="nm-input" class="nm-label">What should Robot 1 do?</label>
+            <input id="nm-input" type="text" autocomplete="off" placeholder="Write or speak a mission">
+            <p id="nm-hint" class="nm-hint">&nbsp;</p>
+            <div class="actions">
+              <button type="button" id="nm-next">Next</button>
+            </div>
+          </div>
+          <div id="nm-step2" class="nm-step" hidden>
+            <p class="nm-label">Start this mission for Robot 1?</p>
+            <p id="nm-text" class="nm-text"></p>
+            <p class="nm-hint">Demo: nothing will be sent.</p>
+            <div class="actions">
+              <button type="button" id="nm-start">Start</button>
+              <button type="button" id="nm-cancel">Cancel</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </main>
+
+    <p class="demo-tag">Demo data</p>
+    <pre id="diag" class="diag" aria-hidden="true" hidden></pre>
+  </div>
+  <script src="app.js"></script>
+</body>
+</html>
